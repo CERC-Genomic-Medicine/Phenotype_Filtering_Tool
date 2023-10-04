@@ -5,12 +5,13 @@
 <!--produced by Vincent Chapdelaine September 2023-->
 <!--Goal : Interactive Display of phenotype for purpose of filtering/visualisation
  Necessary file : JSON format, Elements are phenotype, features are descriptions of phenotype,
- Necessary features : "Variable" "Domain" "Label" # each are used for display titles
+ Necessary features : "Variable"  "Domain" "Label" # each are used for display titles
  Possible information : All other information are technically optional but highly
                    information are displayed in 4 separate tables : Statistics / Outliers / Samples / Normality and a Filtering option
                    information are displayed according to their feature name pattern : "[Table Name] table row name", the table names are the same as iterated above.
                    Certain statistics are combined if named appropriately, mean [SD] combines [Statistics] mean and [Statistics] SD, range : [Statistics] Minimum /  [Statistics] Maximum, percentile [5,50,95] : [Statistics] PERC_5 [Statistics], median [Statistics], PERC_95
                    If JSON file has mean, Minimum, median, the script will expect the other information to combine.
+ Script also expect an image to be found for each element named images/[Variable]_distribution.png
 -->
  
 <!--External Dependencies: Importing Bootstrap CSS and JS libraries-->
@@ -387,7 +388,7 @@
                if (obj['N uniques values'] > 1) {
 
                var separatorImage = document.createElement("img");
-               separatorImage.src = "images/" + obj[Object.keys(obj)[0]].split(" ")[0] + "_distribution.png";
+               separatorImage.src = "images/" + obj[Variable] + "_distribution.png";
                separatorImage.classList.add("separator-image");
                jsonContainer.appendChild(separatorImage);
            }
