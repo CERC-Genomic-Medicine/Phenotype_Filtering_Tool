@@ -44,13 +44,13 @@ catalog_sheet_main = 'COMBINED_CATALOG'
 
 missing_categories = {'no answer', 'missing', 'missing answer', 'not available', 'not applicable', '-9', '-7', '77', '88', '99'}
 
-def rint(listed):
+def rint(listed): # Rank Inverse Normal Transformation
     c=3/8
     rank=rankdata(listed)
     x = (rank - c) / (len(rank) - 2*c + 1)
     return norm.ppf(x)
 
-def plot(df,row,meaned,sd):
+def plot(df,row,meaned,sd): # Creates three pannel displaying the phenotype distribution
     #Raw Phenotype Distribution
     maxVal=np.nanmax(df.RECODED)
     minVal=np.nanmin(df.RECODED)
@@ -169,7 +169,7 @@ def recursive_detect_missing_codes_7(variable, missing_codes, df_pheno):
 def filter_continuous_variables(df_variables, df_missing_codes, df_pheno, df_pheno_final):
     for index, row in df_variables.iterrows():
         variable = row['Varname']
-        if 'RX_MED' in variable :
+        if 'RX_MED' in variable : # Not relevant for GWAS
             continue
         if variable not in df_pheno.columns:
             continue
@@ -182,6 +182,7 @@ def filter_continuous_variables(df_variables, df_missing_codes, df_pheno, df_phe
         missing_codes = variable_missing_codes.get(variable, set())
 
         df_pheno_cut = df_pheno[['SEX_BIRTH', variable]].copy()
+        #Removes Known missing codes
         df_pheno_cut['RECODED'] = df_pheno_cut[variable].apply(lambda x: None if x in missing_codes else x )
 
         while recursive_detect_missing_codes_9('RECODED', missing_codes, df_pheno_cut):
