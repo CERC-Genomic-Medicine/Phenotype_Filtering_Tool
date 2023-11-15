@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<!--produced by Vincent Chapdelaine November 2023-->
+<!--compatible with https://github.com/CERC-Genomic-Medicine/scripts/blob/master/prepare_binary_variables.py-->
+
+<head>
+    <title>Binary Statistic visualiser</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 5px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Statistics Table Visualizer</h2>
+
+
+<input type="file" id="fileInput">
+<br><br>
+<button id="saveButton">Save Table</button>
+<br><br>
+<div id="tableContainer"></div>
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+    var file = event.target.files[0];
+    var reader = new FileReader();
+
+    reader.onload = function(e) {
+        var contents = e.target.result;
+        var lines = contents.split('\n');
+        createTableWithCheckboxes(lines);
+    };
+
+    reader.readAsText(file);
+});
+document.getElementById('saveButton').addEventListener('click', function() {
+    saveTable();
+});
+
+function createTableWithCheckboxes(lines) {
+    var table = '<table>';
+    var excludeColumnIndex = -1;
+    var sexSpecificColumnIndex = -1;
+
+    lines.forEach(function(line, index) {
+        var trimmedLine = line;
+        if (!trimmedLine) {
+            return; // Skip empty lines
+        }
+
+        var row = '<tr>';
+        var cells = trimmedLine.split('\t').map(s => s.trim());;
+
+        if (index === 0) {
+            // Check for existing "Exclude" and "Sex-specific" columns
+            excludeColumnIndex = cells.indexOf('Exclude');
+            sexSpecificColumnIndex = cells.indexOf('Sex-specific');
+        }
+
+        cells.forEach(function(cell, cellIndex) {
+            if (index === 0) {
+                // Header row
+                row += '<th>' + cell + '</th>';
+            } else {
+                // Data rows
+                if (cellIndex === excludeColumnIndex || cellIndex === sexSpecificColumnIndex) {
+                    var isChecked = cell.trim().toLowerCase() === 'true';
+                    row += '<td><input type="checkbox" ' + (isChecked ? 'checked' : '') + '></td>';
+                } else {
+                    row += '<td>' + cell + '</td>';
+                }
+            }
+        });
+
+        row += '</tr>';
+        table += row;
+    });
+
+    table += '</table>';
+    document.getElementById('tableContainer').innerHTML = table;
+}
+
+function saveTable() {
+    var table = document.querySelector('table');
+    var lines = [];
+
+    for (var row of table.rows) {
+        var cells = [];
+
+        for (var cell of row.cells) {
+            if (cell.querySelector('input[type="checkbox"]')) {
+                cells.push(cell.querySelector('input[type="checkbox"]').checked ? 'true' : 'false');
+            } else {
+                cells.push(cell.innerText);
+            }
+        }
+
+        lines.push(cells.join('\t'));
+    }
+
+    var tsvContent = lines.join('\n');
+    download('exported_table.tsv', tsvContent);
+}
+
+function download(filename, text) {
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/tab-separated-values;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+}
+
+    </script>
+
+</body>
+</html>
