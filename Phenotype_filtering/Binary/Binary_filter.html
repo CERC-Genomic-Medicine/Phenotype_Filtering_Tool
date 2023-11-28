@@ -1,127 +1,312 @@
 <!DOCTYPE html>
-<html>
-<!--produced by Vincent Chapdelaine November 2023-->
-<!--compatible with https://github.com/CERC-Genomic-Medicine/scripts/blob/master/prepare_binary_variables.py-->
 
+<html>
 <head>
-    <title>Binary Statistic visualiser</title>
-    <style>
-        table, th, td {
-            border: 1px solid black;
+<!--produced by Vincent Chapdelaine September 2023-->
+<!--External Dependencies: Importing Bootstrap CSS and JS libraries-->
+<link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" rel="stylesheet"/>
+<script crossorigin="anonymous" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" src="https://code.jquery.com/jquery-3.3.1.slim.min.js">
+</script>
+<script crossorigin="anonymous" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js">
+</script>
+<script crossorigin="anonymous" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js">
+</script>
+<title>
+   Phenotype filtering
+  </title>
+<style>
+   table {
             border-collapse: collapse;
+            width: 98%;
+            table-layout: auto;
+            font-size: 0.8em; /* Smaller font size */
+            margin: 0 auto;
         }
         th, td {
-            padding: 5px;
+            padding: 8px;
             text-align: left;
+            border-bottom: 1px solid #ddd;
         }
-    </style>
+        th {
+            background-color: #f2f2f2;
+        }
+        thead {
+            font-size: 1.3em;
+            margin: 0 auto;
+            background-color:#a6a6a6 ;
+            colspan:"2";
+        }
+        .checkbox-cell {
+            text-align: center;
+        }
+        .checkbox-cell input[type="checkbox"] {
+            transform: scale(1.5);
+        }
+        .separator-image {
+            display: block;
+            max-width: 40%;
+            margin-top: 8px;
+            margin-bottom: 8px;
+            margin-left: 0;
+        }
+        .save-button {
+            margin-top: 16px;
+        }
+        .headers {
+        text-align: center;
+        background-color: black;
+        color: white;
+        }
+        .warnings {
+        text-align: center;
+        background-color: #f75b00;
+        color: black;
+        font-size: 1.0em;
+        border-collapse: collapse;
+        width:95%;
+        margin: 0 auto;
+        }
+        .span{
+            float: right;
+        }
+        .div{
+            clear:both; 
+            overflow:auto;
+        }
+  </style>
 </head>
+<!--Body section: Contains the main content of the web page-->
 <body>
+<!--Main container-->
+<div id="jsonContainer">
+</div>
+<!--Save changes by downloading a version with filters-->
+<button class="save-button">
+   Save Changes
+  </button>
+<script>
 
-    <h2>Statistics Table Visualizer</h2>
 
 
-<input type="file" id="fileInput">
-<br><br>
-<button id="saveButton">Save Table</button>
-<br><br>
-<div id="tableContainer"></div>
-    <script>
-        document.getElementById('fileInput').addEventListener('change', function(event) {
-    var file = event.target.files[0];
-    var reader = new FileReader();
 
-    reader.onload = function(e) {
-        var contents = e.target.result;
-        var lines = contents.split('\n');
-        createTableWithCheckboxes(lines);
-    };
 
-    reader.readAsText(file);
-});
-document.getElementById('saveButton').addEventListener('click', function() {
-    saveTable();
-});
-
-function createTableWithCheckboxes(lines) {
-    var table = '<table>';
-    var excludeColumnIndex = -1;
-    var sexSpecificColumnIndex = -1;
-
-    lines.forEach(function(line, index) {
-        var trimmedLine = line;
-        if (!trimmedLine) {
-            return; // Skip empty lines
-        }
-
-        var row = '<tr>';
-        var cells = trimmedLine.split('\t').map(s => s.trim());;
-
-        if (index === 0) {
-            // Check for existing "Exclude" and "Sex-specific" columns
-            excludeColumnIndex = cells.indexOf('Exclude');
-            sexSpecificColumnIndex = cells.indexOf('Sex-specific');
-        }
-
-        cells.forEach(function(cell, cellIndex) {
-            if (index === 0) {
-                // Header row
-                row += '<th>' + cell + '</th>';
-            } else {
-                // Data rows
-                if (cellIndex === excludeColumnIndex || cellIndex === sexSpecificColumnIndex) {
-                    var isChecked = cell.trim().toLowerCase() === 'true';
-                    row += '<td><input type="checkbox" ' + (isChecked ? 'checked' : '') + '></td>';
-                } else {
-                    row += '<td>' + cell + '</td>';
-                }
-            }
-        });
-
-        row += '</tr>';
-        table += row;
-    });
-
-    table += '</table>';
-    document.getElementById('tableContainer').innerHTML = table;
-}
-
-function saveTable() {
-    var table = document.querySelector('table');
-    var lines = [];
-
-    for (var row of table.rows) {
-        var cells = [];
-
-        for (var cell of row.cells) {
-            if (cell.querySelector('input[type="checkbox"]')) {
-                cells.push(cell.querySelector('input[type="checkbox"]').checked ? 'true' : 'false');
-            } else {
-                cells.push(cell.innerText);
-            }
-        }
-
-        lines.push(cells.join('\t'));
+    function toggleTextbox(vary) {
+      const checkbox = document.getElementById(vary+'_box');
+      const textbox = document.getElementById(vary+'_text');
+      textbox.style.display = checkbox.checked ? 'block' : 'none';
     }
 
-    var tsvContent = lines.join('\n');
-    download('exported_table.tsv', tsvContent);
-}
+    function toggleTextboxOposite(vary) {
+      const checkbox = document.getElementById(vary+'_box');
+      const textbox = document.getElementById(vary+'_text');
+      textbox.style.display = checkbox.checked ? 'none' : 'block';
+    }
+    function toggleTextboxOptions(vary) {
+      const Options = document.getElementById(vary+'_input');
+      const textbox = document.getElementById(vary+'_text');
+      textbox.style.display = Options.value !== 'None' ? 'block' : 'none';
+    }
+    function togglelistOptions(vary) {
+      const checkbox = document.getElementById(vary+'_box');
+      const options = document.getElementById(vary+'_options');
+      options.style.display = checkbox.checked ? 'block' : 'none';
+    }
+  //Function to adress max number of decimal
+   function Rounder(number) {
+            if (isNaN(number)){ returned = number;}
+            else if (String((number- Math. floor(number))).length > 2 ) {returned = number.toFixed(3);}
+            else {returned = number;}
+        return returned
+        }
+                // Load JSON file
+    var fileInput = document.createElement('input');
+    fileInput.type = 'file';
 
-function download(filename, text) {
-    var element = document.createElement('a');
-    element.setAttribute('href', 'data:text/tab-separated-values;charset=utf-8,' + encodeURIComponent(text));
-    element.setAttribute('download', filename);
+    fileInput.addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var jsonData = JSON.parse(e.target.result);
+            var jsonContainer = document.getElementById("jsonContainer");
+            // Generate tables and images for each JSON object
+            jsonData.forEach(function(obj, index) {
+                var headerKeys = Object.keys(obj);
+                headerKeys.splice(1, 0, "Threshold Right");
+                headerKeys.splice(1, 0, "Threshold Left");
+                headerKeys.splice(1, 0, "Sex-Specific");
+                headerKeys.splice(1, 0, "To normalize");
+                headerKeys.splice(1, 0, "To exclude");
+                //Create a header explaining phenotype
+                var title= document.createElement("h1");
+                title.textContent=obj["[Description] Variable"] + '[' + obj["[Description] Domain"] + ']' + '(' + obj["[Description] Label"]  +')';
+                title.classList.add("headers");
+                if (obj['[Hidden] problem'].length !==0) {title.style.backgroundColor = "#f75b00"}
+                jsonContainer.appendChild(title);
+                //Create Container of all tables with bootstrap grid so in-line
+                var Container_table = document.createElement('div');
+                Container_table.className = "row"  ;
+                // 1) Options table
+                var Container_table1 = document.createElement('div');
+                Container_table1.className = "col" ;
+                Container_table1.id = obj["[Description] Variable"]+'Container_table1';
+                const table1_index = ['To exclude',"Sex-Specific"] ;
+                var table1 = document.createElement("table");
+                var thead1 = table1.createTHead();
+                var tbody1 = table1.createTBody();
+                thead1.textContent = 'Filters';
+                table1_index.forEach(function(key) {
+                    row = tbody1.insertRow();
+                    var th = document.createElement("th");
+                    th.textContent = key;
+                    row.appendChild(th);
+                    var td = row.insertCell()
+                    if (key === "To exclude"){
+                        var checkbox = document.createElement("input");
+                        checkbox.type = "checkbox";
+                        checkbox.checked = obj[key] || false;
+                        checkbox.id=obj["[Description] Variable"]+key+'_box';
+                        td.appendChild(checkbox);
+                        checkbox.addEventListener('change', function() {
+                            jsonData[index][key] = checkbox.checked;
+                        });
+                        var textbox = document.createElement("input"); 
+                        textbox.type = "text";
+                        textbox.id = obj["[Description] Variable"]+key+'_text';
+                        textbox.style.display=checkbox.checked !== false ? "block" : "none";
+                        textbox.placeholder='Justification to exclude';
+                        textbox.value = checkbox.checked !== false ? obj["justification_" + key].toString() : "";
+                        td.appendChild(textbox);
+                        checkbox.addEventListener("click", function() {
+                            toggleTextbox(obj["[Description] Variable"] + key) })
+                    }
+                    else if (key === "Sex-Specific"){
+                            var checkbox = document.createElement("input");
+                            checkbox.type = "checkbox";
+                            checkbox.checked = obj[key] || false;
+                            checkbox.id = obj["[Description] Variable"] + key + '_box';
+                            td.appendChild(checkbox);
+                            checkbox.addEventListener('change', function() {
+                                jsonData[index][key] = checkbox.checked;
+                            });
+                            var SexInput = document.createElement("select");; 
+                            SexInput.id = obj["[Description] Variable"] + key+'_options';
+                            var noneOption = document.createElement("option");
+                            noneOption.value = "None";
+                            noneOption.text = "None";
+                            SexInput.add(noneOption);
+                            var option = document.createElement("option");
+                            option.value = 'Males';
+                            option.text = 'Males';
+                            SexInput.add(option);
+                            var option = document.createElement("option");
+                            option.value = 'Females';
+                            option.text = 'Females';
+                            SexInput.add(option);
+                            SexInput.style.display = checkbox.checked !== false ? "block" : "none";
+                            SexInput.value = checkbox.checked !== false ? obj["Choice_" + key].toString() : "";
+                            td.appendChild(SexInput);
+                        checkbox.addEventListener("click", function() {
+                            togglelistOptions(obj["[Description] Variable"] + key)
+                        });
+                    }
+                });
+               Container_table1.appendChild(table1); // table 1 added to Container of table 1
+               var Container_image1 = document.createElement('div');
+               Container_image1.className = "col-6" ;
+               var separatorImage = document.createElement("img");
+               separatorImage.src = "images/" + obj["[Description] Variable"] + "_pie_phenotype.png";
+               separatorImage.classList.add("separator-image");
+               Container_image1.appendChild(separatorImage);
+                // 2) Statistics table
+                var table2 = document.createElement("table");
+                var thead2 = table2.createTHead();
+                var tbody2 = table2.createTBody();
+                thead2.textContent = 'Samples';
+                var Container_table2 = document.createElement('div');
+                Container_table2.className = "col"
+                Container_table2.id = obj["[Description] Variable"]+'_Container_table2';
+                headerKeys.forEach(function(key) {
+                    Statistics=key.replace('[Statistics] ','')
+                    if (key.split(' ')[0] === '[Statistics]'){
+                        row = tbody2.insertRow();
+                        var th = document.createElement("th");
+                        row.appendChild(th);
+                        var td = row.insertCell();
+                            cell = Rounder(obj[key])
+                            rowID = Statistics
+                        th.textContent = rowID;
+                        td.textContent = cell;
+                        if (obj['[Hidden] problem'].includes(key)){
+                            th.style.backgroundColor = "#f75b00";
+                            td.style.backgroundColor = "#f75b00";
+                    }
+                    }
+                });
+               Container_table2.appendChild(table2);
 
-    element.style.display = 'none';
-    document.body.appendChild(element);
 
-    element.click();
 
-    document.body.removeChild(element);
-}
+                   // 3) Outlier information table
+                   //4) Samples table
 
-    </script>
+               // Adding skewness and kurtosis warning
+               if (obj['[Hidden] problem']){
+                    var problem = obj['[Hidden] problem'];
+                    problem.forEach(function(key) {
+                    var warningTotal= document.createElement("h1");
+                    warningTotal.textContent= key;
+                    warningTotal.classList.add("warnings");
+                    Container_table2.appendChild(warningTotal);
+            })
+        }
 
+               // Adding Container tables to Json container
+               Container_table.appendChild(Container_table1) ;
+               Container_table1.parentNode.insertBefore(Container_image1, Container_table1.nextSibling) ;
+               Container_table1.parentNode.insertBefore(Container_table2, Container_table1.nextSibling) ;
+               jsonContainer.appendChild(Container_table) ;
+               })
+            
+            // Save Changes button 
+            var saveButton = document.querySelector('.save-button');
+            saveButton.addEventListener('click', function() {
+                saveChanges();
+                })
+            function saveChanges() {
+                // Update jsonData with default values for Included, Normalize and Threshold properties
+                jsonData.forEach(function(obj) {
+                    ['To exclude'].forEach(function (textName) {
+                        textbox = document.getElementById(obj["[Description] Variable"]+textName+'_text');
+                        checkbox = document.getElementById(obj["[Description] Variable"]+textName+'_box');
+                        if (checkbox.checked !== false) {
+                            obj["justification_" + textName] = textbox.value ;
+                        }
+                    });
+                    ['Sex-Specific'].forEach(function (ChoiceName) {
+                        listOptions = document.getElementById(obj["[Description] Variable"]+ChoiceName+'_options');
+                        checkbox = document.getElementById(obj["[Description] Variable"]+ChoiceName+'_box');
+                        if (checkbox.checked !== false) {
+                            obj["Choice_" + ChoiceName] = listOptions.value ;
+                        }
+                    });
+                    ["To exclude","Sex-Specific"].forEach(function (checkboxName) {
+                        obj[checkboxName] = obj[checkboxName] || false;
+                    });
+                });
+                var updatedJsonData = JSON.stringify(jsonData);
+                var blob = new Blob([updatedJsonData], { type: 'application/json' });
+                var url = URL.createObjectURL(blob);
+                var link = document.createElement('a');
+                link.href = url;
+                link.download = file.name;
+                link.click();
+            }
+        };
+
+        reader.readAsText(file);
+    });
+
+    document.body.appendChild(fileInput);
+</script>
 </body>
 </html>
