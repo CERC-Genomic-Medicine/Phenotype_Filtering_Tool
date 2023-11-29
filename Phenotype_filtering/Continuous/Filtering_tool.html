@@ -109,7 +109,7 @@
     function togglelistOptions(vary) {
       const checkbox = document.getElementById(vary+'_input');
       const options = document.getElementById(vary+'_options');
-      options.style.display = options.value !== 'None' ? 'block' : 'none';
+      options.style.display = checkbox.checked !== 'None' ? 'block' : 'none';
     }
   //Function to adress max number of decimal
    function Rounder(number) {
