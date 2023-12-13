@@ -295,4 +295,4 @@ if __name__ == '__main__':
     sorted_df = sorted_df.drop('Length', axis=1)
 
     df_variables_final.to_csv(f'{args.out_prefix}.summary.tsv', sep = '\t', header = True, index = False)
-    sorted_df.to_json(f'{args.out_prefix}.summary.json', orient='records')
+    sorted_df.to_json(f'{args.out_prefix}.json', orient='records')
