@@ -11,7 +11,8 @@ wget https://github.com/CERC-Genomic-Medicine/CARTaGENE_PheWas/blob/4b9bed6e68ff
 unzip Continuous_filter.zip
 *** click on Continuous_filter ***
 ```
-* Continuous_filter requieres a file named Continuous_data.json and an images directory (with images associated with each phenotype with N_unique > 1). All these file should be produced with the Script_statistics_continuous_variable.py.
+* Continuous_filter requieres __in the same directory as the executable__ a file named Continuous_data.json and an images/ directory (with images associated with each phenotype with N_unique > 1). All these file should be produced with the Script_statistics_continuous_variable.py.
+* Flags can be adjusted using the options in the Script_statistics_continuous_variable.py
 
 
 
