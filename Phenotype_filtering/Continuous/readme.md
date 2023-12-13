@@ -8,8 +8,8 @@ python3 Script_statistics_continuous_variable.py -c Catalog.excel -p Phenotype.c
 mkdir images
 mv *.png images/
 wget https://github.com/CERC-Genomic-Medicine/CARTaGENE_PheWas/blob/4b9bed6e68ff3058373ac8e71029c6e5e7257397/Phenotype_filtering/Continuous/Continuous_filter.zip
-unzip Continuous_filter.zip
-*** click on Continuous_filter ***
+unzip Continuous_filter_tool.zip
+*** click on Continuous_filter_tool ***
 ```
 * Continuous_filter requieres __in the same directory as the executable__ a file named Continuous_data.json and an images/ directory (with images associated with each phenotype with N_unique > 1). All these file should be produced with the Script_statistics_continuous_variable.py.  
 * Flags can be adjusted using the options in the Script_statistics_continuous_variable.py optional inputs
