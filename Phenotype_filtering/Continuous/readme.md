@@ -4,7 +4,7 @@ Create a Data Analysis tool to identify and curate phenotype appropriate for GWA
 
 Usage :
 
-With a file named Continuous_data.json (created with the associate python script) and an images/ directory (with images created with the same script) simply click on the Unix executable.
+With a file named Continuous_data.json (created with Script_statistics_continuous_variable.py) and an images/ directory (with images created with Script_statistics_continuous_variable.py) simply click on the Unix executable.
 
 
 
