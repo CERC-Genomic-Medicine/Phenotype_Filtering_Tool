@@ -15,9 +15,9 @@ function toggleTextboxOptions(vary) {
   textbox.style.display = Options.value !== 'None' ? 'block' : 'none';
 }
 function togglelistOptions(vary) {
-  const checkbox = document.getElementById(vary+'_input');
+  const checkbox = document.getElementById(vary+'_box');
   const options = document.getElementById(vary+'_options');
-  options.style.display = options.value !== 'None' ? 'block' : 'none';
+  options.style.display = checkbox.checked ? 'block' : 'none';
 }
 
 const touched = new Set();
