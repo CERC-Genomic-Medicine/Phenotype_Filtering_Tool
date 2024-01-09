@@ -58,7 +58,7 @@ function createWarning(text){
 function update(){
 jsonData.forEach(function(obj,index) {
 if (obj['[Hidden] problem'].length !==0) {problematic++
-    if (obj['[Hidden] problem'].includes('Females') || obj['[Hidden] problem'].includes('Males')){SexSpecific++}
+    if (obj['[Hidden] problem'].includes('Sex-Specific ?')){SexSpecific++}
     exclude = document.getElementById(obj["[Description] Variable"]+'To exclude_box').checked ;
     SS = document.getElementById(obj["[Description] Variable"]+'Sex-Specific_box').checked ;
     if (exclude || SS) {problematic_addressed++}
@@ -358,7 +358,7 @@ jsonData.forEach(function(obj,index) {
 
                var Container_image1 = document.createElement('div');
                Container_image1.className = "col" ;
-   if (window.form === 'Binary' || obj['[Statistics] N uniques values'] > 1) {
+   if (window.form === 'Binary' || typeof obj['[Statistics] N uniques values'] != "undefined" || obj['[Statistics] N uniques values'] > 1) {
                var separatorImage = document.createElement("img");
                separatorImage.id = obj["[Description] Variable"] + "_image";
                fetch_image(obj["[Description] Variable"]);
@@ -500,4 +500,3 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
-
