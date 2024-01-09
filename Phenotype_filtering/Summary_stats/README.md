@@ -34,10 +34,10 @@ python Continuous_summary_statistics.py -c [catalog] -p [phenotypes] -s [samples
 | `-p` or `--phenotypes` | Path to the CSV file with phenotype values.                            |
 | `-s` or `--samples`    | File with a list of individual IDs to be considered.                   |
 | `-o` or `--output`     | Prefix for the output files generated.                                 |
-| `-t` or `--outlier_threshold` | Set the standard threshold for outlier detection.                |
-| `-n` or `--n_threshold`| Define the threshold for raising the Sample problem flag.             |
-| `-ss` or `--SS_threshold` | Threshold for raising the Sex-Specific problem flag.              |
-| `-u` or `--u_threshold`| Set the minimum number of unique values before a problem flag is raised. |
+| `-t` or `--outlier_threshold` | Set the max threshold for outlier identification. (default 3)             |
+| `-n` or `--n_threshold`| Define the threshold for raising the Sample problem flag. (default 100)            |
+| `-ss` or `--SS_threshold` | Threshold for raising the Sex-Specific problem flag. (default 10)             |
+| `-u` or `--u_threshold`| Set the minimum number of unique values before a problem flag is raised. (default 5) |
 
 ### Usage Binary version
 
