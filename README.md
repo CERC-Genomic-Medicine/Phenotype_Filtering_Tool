@@ -36,4 +36,4 @@ This tool aim to provide a User Interface to display variables statistics and im
 
 ### Broader application
 
-While this tool currently has features unique to certain types of data (i.e. Sex-Specific) integrated, the tool can still be used to explore and filter broader data. The feature of each objects are grouped and displayed into tables along the feature key scheme : '[table head/group] row name'. All '[Hidden]' and '[Description]' groups are not displayed into tables. This version provide support for the combination of some features (ex. [Statistics] Maximum + [Statistics] Minimum -> Range [min,max]
+While this tool currently has features unique to certain types of data (i.e. Sex-Specific) integrated, the tool can still be used to explore and filter broader data. The feature of each objects are grouped and displayed into tables along the feature key scheme : '[table head/group] row name'. All '[Hidden]' and '[Description]' groups are not displayed into tables. This version provide support for the combination of some features (ex. [Statistics] Maximum + [Statistics] Minimum -> Range [min,max]) but doesn't requiere them.
