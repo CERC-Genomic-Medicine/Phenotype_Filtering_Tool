@@ -39,7 +39,24 @@ python Continuous_summary_statistics.py -c [catalog] -p [phenotypes] -s [samples
 | `-ss` or `--SS_threshold` | Threshold for raising the Sex-Specific problem flag. (default 10)             |
 | `-u` or `--u_threshold`| Set the minimum number of unique values before a problem flag is raised. (default 5) |
 
+##  Binary version
+
+### Additional Feature
+- **Filtering**: If specified can take a Json's filter (obtained through https://github.com/CERC-Genomic-Medicine/CARTaGENE_PheWas/tree/d1b00e77aac95383536bde07c5a3756e1d8b95b8/Phenotype_filtering/Filtering_tool)
+
 ### Usage Binary version
 
+| Argument               | Description                                                                                     |
+|------------------------|-------------------------------------------------------------------------------------------------|
+| `-c` or `--catalog`    | Excel spreadsheet "COMBINED_CATALOG_*.xlsx". Contains meta-information about variables and sheets like "COMBINED_CATALOG", "Categories", "Linear data missing codes". |
+| `-p` or `--phenotypes` | CSV file with phenotype values for each sample in the CARTaGENE study.                           |
+| `-s` or `--samples`    | List of individual IDs to consider (e.g., PLINK's *.psam file). The IDs must be in the column named "IID". |
+| `-j` or `--json`       | (Optional) Json file with inclusion and exclusion criteria. Required if `--Final` or `-f` is used. |
+| `-i` or `--images`     | Produce age distributions. This is a flag with no additional arguments needed.                  |
+| `-f` or `--Final`      | Produce phenotype file with modifications from a JSON file. This is a flag with no additional arguments needed. |
+| `-o` or `--output`     | Prefix for output files.                                                                        |
+| `-n` or `--n_threshold`| Threshold at which the number of Sample problem flag is raised.                                 |
+| `--c_threshold`        | Threshold at which the number of Sample problem flag is raised.                                 |
+| `-ss` or `--SS_threshold` | Threshold at which the number of Sex-Specific problem flag is raised.                       |
 
 
