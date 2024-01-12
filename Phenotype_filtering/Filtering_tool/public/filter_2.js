@@ -56,20 +56,25 @@ function createWarning(text){
 
 
 function update(){
-jsonData.forEach(function(obj,index) {
-if (obj['[Hidden] problem'].length !==0) {problematic++
-    if (obj['[Hidden] problem'].includes('Sex-Specific ?')){SexSpecific++}
-    exclude = document.getElementById(obj["[Description] Variable"]+'To exclude_box').checked ;
-    SS = document.getElementById(obj["[Description] Variable"]+'Sex-Specific_box').checked ;
-    if (exclude || SS) {problematic_addressed++}
-} 
-if (!obj['To exclude']){
-    included++
-}
-});
+    let flagged = 0;
+    let problematic = 0;
+    let problematic_addressed = 0;
+    let SexSpecific = 0
+    let included = 0
+    jsonData.forEach(function(obj,index) {
+        if (obj['[Hidden] problem'].length !==0) {problematic++
+            if (obj['[Hidden] problem'].includes('Sex-Specific ?')){SexSpecific++}
+            exclude = document.getElementById(obj["[Description] Variable"]+'To exclude_box').checked ;
+            SS = document.getElementById(obj["[Description] Variable"]+'Sex-Specific_box').checked ;
+            if (exclude || SS) {problematic_addressed++}
+        } 
+        if (!obj['To exclude']){
+            included++
+        }
+    });
 document.getElementById('Problematic_total').textContent= 'Adressed : ' + problematic_addressed+ '/'+problematic ;
 const current = currentIndex+1
-document.getElementById('viewing').textContent='Viewed : ' + current + '/'+jsonData.length ;
+document.getElementById('viewing').textContent='Viewing : ' + current + '/'+jsonData.length ;
 document.getElementById('Included').textContent='Included : ' + included + '/'+jsonData.length ;
 
 }
@@ -183,15 +188,39 @@ function display(text, object){
     head.forEach(function(key) {
         Statistics=key.replace(text,'')
         if (key.split(' ')[0] === text){
-            row = tbody.insertRow();
-            var th = document.createElement("th");
-            row.appendChild(th);
-            var td = row.insertCell();
-                cell = Rounder(object[key])
-                rowID = Statistics
-            th.textContent = rowID;
-            td.textContent = cell;
-        }
+            if (['[Statistics] PERC_95', '[Statistics] PERC_5','[Statistics] median'].every(element => head.includes(element)) && [' PERC_95', ' PERC_5',' median'].includes(Statistics)){
+                if ([' PERC_95', ' PERC_5'].includes(Statistics)){return;}
+                else if (Statistics ===' median') {
+                    cell = '[' + Rounder(object['[Statistics] PERC_5']) +' , ' + Rounder(object['[Statistics] median']) + ' , '+ Rounder(object['[Statistics] PERC_95']) + ']' ;
+                    rowID ='Percentile [5,50,95]'
+                }
+            }
+            else if (['[Statistics] SD', '[Statistics] Mean'].every(element => head.includes(element)) && [' Mean', ' SD'].includes(Statistics)){
+                if (' SD' === Statistics){return;}
+                else if (Statistics===' Mean') {
+                    rowID = 'μ\u0305 [SD]'
+                    cell= Rounder(object['[Statistics] Mean']) + ' [' +  Rounder(object['[Statistics] SD']) +' ]'
+                }
+            }
+            else if (['[Statistics] Minimum', '[Statistics] Maximum'].every(element => head.includes(element)) && [' Minimum', ' Maximum'].includes(Statistics)){
+                if (' Minimum' === Statistics){return;}
+                else if (Statistics===' Maximum') {
+                    cell = '[' + Rounder(object['[Statistics] Minimum']) +' , ' + Rounder(object['[Statistics] Maximum']) + ']' 
+                    rowID = 'Range'
+                }
+            }
+            else {
+                    cell = Rounder(object[key])
+                    rowID = Statistics.replace('Mean','μ\u0305 ').replace('mean','μ\u0305 ')
+            }
+                row = tbody.insertRow();
+                var th = document.createElement("th");
+                row.appendChild(th);
+                var td = row.insertCell();
+                th.textContent = rowID;
+                td.textContent = cell;
+            };
+
     });
         Container_table.appendChild(table)
         return Container_table
@@ -458,11 +487,7 @@ document.getElementById('prev-btn').addEventListener('click', displayPrev);
 
 const touched = new Set();
 let currentIndex = 0;
-let flagged = 0;
-let problematic = 0;
-let problematic_addressed = 0;
-let SexSpecific = 0
-let included = 0
+
 
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -500,3 +525,4 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+
