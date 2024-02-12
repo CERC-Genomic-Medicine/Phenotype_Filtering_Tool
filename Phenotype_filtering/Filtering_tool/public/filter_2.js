@@ -54,13 +54,49 @@ function createWarning(text){
     return(alertDiv);
 }
 
+function searchAutocomplete() {
+  var input = document.getElementById('search-bar').value;
+  var regex = new RegExp(input, "i"); // "i" for case-insensitive
+  var autocompleteList = document.getElementById('autocomplete-list');
+  autocompleteList.innerHTML = ''; // Clear existing suggestions
+
+  if (!input) return false;
+
+  jsonData.forEach(function(obj) {
+    var descriptionVariable = obj["[Description] Variable"] || "";
+    var descriptionLabel = obj["[Description] Label"] || "";
+
+    // Use regex test to check for match instead of includes
+    if (regex.test(descriptionVariable) || regex.test(descriptionLabel)) {
+      var suggestionDiv = document.createElement("DIV");
+      suggestionDiv.innerHTML = descriptionVariable + " (" + descriptionLabel + ")";
+      suggestionDiv.addEventListener("click", function() {
+        document.getElementById('search-bar').value = this.innerText;
+        autocompleteList.innerHTML = '';
+
+        document.getElementById(descriptionVariable).scrollIntoView()
+            jsonData.forEach(function(obj,index) {
+            if (obj["[Description] Variable"] ==descriptionVariable) {currentIndex=index}
+            })
+            update();
+      });
+
+      autocompleteList.appendChild(suggestionDiv);
+    }
+  });
+}
+
+document.addEventListener("click", function () {
+  document.getElementById('autocomplete-list').innerHTML = '';
+
+});
 
 function update(){
     let flagged = 0;
     let problematic = 0;
     let problematic_addressed = 0;
-    let SexSpecific = 0
-    let included = 0
+    let SexSpecific = 0;
+    let included = 0;
     jsonData.forEach(function(obj,index) {
         if (obj['[Hidden] problem'].length !==0) {problematic++
             if (obj['[Hidden] problem'].includes('Sex-Specific ?')){SexSpecific++}
@@ -81,14 +117,13 @@ document.getElementById('Included').textContent='Included : ' + included + '/'+j
 
 
 function validate(){
-    if (problematic_addressed === problematic && touched.size===jsonData.length){
-        alert("All phenotypes were adressed and viewed.")
+    if (problematic_addressed === problematic){
+        alert("All flagged phenotypes were adressed.")
     } else {
-        if (problematic_addressed === problematic) {  alert("not all phenotypes were view in this session. But all flagged phenotypes have been adressed")}
-        else if (touched.size===jsonData.length) {alert("not all phenotypes were adressed. But all phenotypes have been viewed in this session") }
-        else { alert("not all phenotypes were viewed and not all problematic phenotypes were adressed.")}  
+        alert("All flagged phenotypes have been adressed")
 }
 }
+
 
 
 //Function to adress max number of decimal
@@ -230,7 +265,7 @@ function display(text, object){
 
 function loader(){
 jsonData.forEach(function(obj,index) {
-    var objectDix = document.createElement('div');
+    var objectDix = document.createElement('nav-item');
     objectDix.id=obj["[Description] Variable"]
                 var headerKeys = Object.keys(obj);
                 ["Sex-Specific",'To exclude'].forEach(function(key){
@@ -387,7 +422,7 @@ jsonData.forEach(function(obj,index) {
 
                var Container_image1 = document.createElement('div');
                Container_image1.className = "col" ;
-   if (window.form === 'Binary' || typeof obj['[Statistics] N uniques values'] != "undefined" || obj['[Statistics] N uniques values'] > 1) {
+   if (typeof obj['[Statistics] N unique values'] != "undefined" || obj['[Statistics] N unique values'] > 1) {
                var separatorImage = document.createElement("img");
                separatorImage.id = obj["[Description] Variable"] + "_image";
                fetch_image(obj["[Description] Variable"]);
@@ -420,46 +455,87 @@ jsonData.forEach(function(obj,index) {
                 })
 
                // Adding skewness and kurtosis warning
-   var problem=obj['[Hidden] problem'].split('|')
+    if (obj['[Hidden] problem'].length !== 0 ){
+   var problem=obj['[Hidden] problem']
     problem.forEach(function(key) { 
             objectDix.appendChild(createWarning(key));
-} )
+
+} )}
 
                // Adding Container tables to Json container
                objectDix.appendChild(Container_table) ;
                objectDix.appendChild(Container_image1)
 jsonContainer.appendChild(objectDix)
-objectDix.style.display = "none";
                });
 }
+
+const elementIsVisibleInViewport = (el, partiallyVisible = false) => {
+  const { top, left, bottom, right } = el.getBoundingClientRect();
+  const { innerHeight, innerWidth } = window;
+  return partiallyVisible
+    ? ((top > 0 && top < innerHeight) ||
+        (bottom > 0 && bottom < innerHeight))
+    : top >= 0 && bottom <= innerHeight;
+};
+
+window.onscroll = function (e) {  
+UpdatedCurrentIndex();
+update();
+} 
+
+
 
 function displayNext(){
             if (currentIndex+1 == jsonData.length){ alert("No more objects to display.");
     } else {
-    currentIndex++;
-    touched.add(currentIndex)
-    update();
-        document.getElementById(jsonData[currentIndex-1]["[Description] Variable"]).style.display = "none";
-        document.getElementById(jsonData[currentIndex]["[Description] Variable"]).style.display = 'block';
+            currentIndex = currentIndex + 1;
+        document.getElementById(jsonData[currentIndex+1]["[Description] Variable"]).scrollIntoView();
+        update();
 }
 }
 
+function UpdatedCurrentIndex(){
+for (let i = 0; i < jsonData.length; i++) {
+        if( elementIsVisibleInViewport(document.getElementById(jsonData[i]["[Description] Variable"])) ) {currentIndex=i ; 
+    break;
+    }
+}
+}
 function displayPrev(){
             if (currentIndex == 0){ alert("No more objects to display.");
     } else {
     currentIndex--;
+    document.getElementById(jsonData[currentIndex]["[Description] Variable"]).scrollIntoView()
     update();
-        touched.add(currentIndex)
-        document.getElementById(jsonData[currentIndex+1]["[Description] Variable"]).style.display = "none";
-        document.getElementById(jsonData[currentIndex]["[Description] Variable"]).style.display = 'block';
 }
 }
 
-function displayCurrentObject(){        
-    document.getElementById(jsonData[currentIndex]["[Description] Variable"]).style.display = 'block';
-        update();    
-        touched.add(currentIndex) ;
-    }
+
+function displayPrev10(){
+            if (currentIndex -10 < 0){ alert("No more objects to display.");
+    document.getElementById(jsonData[0]["[Description] Variable"]).scrollIntoView()
+    currentIndex = 0;
+            update();
+    } else {
+    currentIndex = currentIndex - 10;
+    document.getElementById(jsonData[currentIndex]["[Description] Variable"]).scrollIntoView()
+    update()
+}
+}
+
+function displayNext10(){
+            if (currentIndex +10 > jsonData.length){ alert("No more objects to display.");
+                document.getElementById(jsonData[jsonData.length-1]["[Description] Variable"]).scrollIntoView()
+                currentIndex = jsonData.length-1;
+                update();
+    } else {
+    currentIndex = currentIndex + 10;
+        document.getElementById(jsonData[currentIndex]["[Description] Variable"]).scrollIntoView()
+            update();
+
+}
+}
+
 
 function fetch_image(filename){
 fetch('/images/'+filename+'.png')
@@ -484,13 +560,31 @@ document.getElementById('save-btn').addEventListener('click', saveChanges);
 document.getElementById('val-btn').addEventListener('click', validate);
 document.getElementById('next-btn').addEventListener('click', displayNext);
 document.getElementById('prev-btn').addEventListener('click', displayPrev);
+document.getElementById('next10-btn').addEventListener('click', displayNext10);
+document.getElementById('prev10-btn').addEventListener('click', displayPrev10);
 
 const touched = new Set();
 let currentIndex = 0;
-
+let flagged = 0;
+let problematic = 0;
+let problematic_addressed = 0;
+let SexSpecific = 0;
+let included = 0;
 
 
 document.addEventListener("DOMContentLoaded", function() {
+        fetch('/json-files-list')
+        .then(response => response.json())
+        .then(files => {
+            const selectElement = document.getElementById('jsonForm');
+            files.forEach(file => {
+                const option = document.createElement('option');
+                option.value = file;
+                option.text = file;
+                selectElement.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error loading the JSON files list:', error));
     const form = document.getElementById('jsonForm');
     form.addEventListener('change', function(event) {
         event.preventDefault();
@@ -509,7 +603,10 @@ document.addEventListener("DOMContentLoaded", function() {
                jsonData = Data
                loader();
                form.style.display = "none";
-               displayCurrentObject(); // Display the first object after loading
+                const navT = document.getElementById('bottom-nav');
+                const navB = document.getElementById('top-nav');
+                navT.style.display = 'block'
+                navB.style.display = 'block'
            })
           .catch(error => {
              console.error('Error fetching the JSON file:', error);
