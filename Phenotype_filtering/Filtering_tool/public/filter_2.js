@@ -422,7 +422,7 @@ jsonData.forEach(function(obj,index) {
 
                var Container_image1 = document.createElement('div');
                Container_image1.className = "col" ;
-   if (typeof obj['[Statistics] N unique values'] != "undefined" || obj['[Statistics] N unique values'] > 1) {
+   if (typeof obj['[Statistics] N unique values'] === "undefined" || obj['[Statistics] N unique values'] > 1) {
                var separatorImage = document.createElement("img");
                separatorImage.id = obj["[Description] Variable"] + "_image";
                fetch_image(obj["[Description] Variable"]);
