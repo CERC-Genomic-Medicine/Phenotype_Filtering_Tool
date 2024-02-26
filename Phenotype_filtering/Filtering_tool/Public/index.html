@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JSON Object Viewer</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">    <style>
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+        .checkbox-cell {
+            text-align: center;
+        }
+        .checkbox-cell input[type="checkbox"] {
+            transform: scale(1.5);
+        }
+        .separator-image {
+            display: block;
+            height: 500px;
+            margin-top: 8px;
+            margin-bottom: 75px;
+            margin-left: 0;
+        }
+        .save-button {
+            margin-top: 16px;
+        }
+        .div {
+  text-align: center;
+  }
+        .span{
+            float: right;
+        }
+        .alert{
+            margin-bottom : 0.4rem;
+        }
+        .alert-warning {
+    padding: 5px; /* Example: Reducing padding to 5px */
+}
+thead {
+  text-align: center;
+  font-size: 150%;
+  font-weight: bold;
+}
+
+
+  </style>
+</head>
+<body>
+
+<div class="modal fade" id="onload" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">    
+<div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">What type of phenotype do you want to examine ?</h5>
+        </div>
+        <div class="modal-body">
+              <div class= "row">
+                    <div class="col">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id='binary_choice'>Binary</button>
+    </div>
+        <div class="col">
+    </div>
+        <div class="col">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id='continuous_choice'>Continuous</button>
+    </div>
+        </div>
+        </div>
+
+    </div>
+</div>
+</div>
+
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+            <h5 class="modal-title">What filters do you want to place on phenotypes by defaults ?</h5>
+        </div>
+        <div class="modal-body">
+            <div> Do you want to fill in filters for phenotypes ? (will replace any current filters) <input type="checkbox" id='Default'> </div>
+            <table class="table" id="Default_table" style="display: none;">
+                <tbody>
+                    <tr>
+                        <th scope="col">To Exclude</th>
+                        <th scope="col"> <select id="Default_To exclude" >                            
+                            <option value="0" selected="selected">No Default</option>
+                            <option value='Yes'>Exclude</option>
+                            <option value="No">Include</option>
+                        </select> </th>
+                    </tr>
+                    <tr>
+                        <th scope="col">To Normalize (only applies to quantitative traits)</th>
+                        <th scope="col"> <select id="Default_Not normalize" >
+                            <option value="0" selected="selected">No Default</option>
+                            <option value="No"> Normalize</option>
+                            <option value="Yes">Not Normalize</option>
+                        </select>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th scope="col">Threshold Left (only applies to quantitative traits)</th>
+                        <th scope="col"><select id="Default_Threshold Left" >
+                            <option value="0" selected="selected">No Default</option>
+                            <option value="None">None</option>
+                            <option value="1SD">1SD</option>
+                            <option value="2SD">2SD</option>
+                            <option value="3SD">3SD</option>
+                            <option value="4SD">4SD</option>
+                            <option value="5SD">5SD</option>
+                        </select></th>
+                    </tr>
+                    <tr>
+                        <th scope="col">Threshold Right (only applies to quantitative traits)</th>
+                        <th scope="col"><select id="Default_Threshold Right">
+                            <option value="0" selected="selected">No Default</option>
+                            <option value="None">None</option>
+                            <option value="1SD">1SD</option>
+                            <option value="2SD">2SD</option>
+                            <option value="3SD">3SD</option>
+                            <option value="4SD">4SD</option>
+                            <option value="5SD">5SD</option>
+                        </select></th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id='submitButtonDefaults' data-bs-dismiss="modal">Submit</button>
+        </div>
+    </div>
+</div>`
+</div>
+
+
+
+<nav class="navbar navbar-light bg-light fixed-top" id="top-nav" style="display: block;">
+    <div class= "row">
+        <div class="col">
+            <h3> Descriptive Statistics Visualizer v1.0 </h3>
+        </div>
+        <div class="col">        </div>
+          <div class="col">   
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">fill in Filters by default</button>
+               </div>
+
+
+
+            
+        </div>
+        <div class= "row">
+                <div class="col"> 
+                    <input type="search" id="search-bar" class="form-control rounded" placeholder="Search" aria-label="Search" aria-describedby="search-addon" onkeyup="searchAutocomplete()" />
+                    <span class="input-group-text border-0" id="search-addon">
+                        <i class="fas fa-search"></i>
+                        <div id="autocomplete-list" class="autocomplete-items"></div>
+                    </span>
+                </div>
+        </div>
+</nav>
+<br>   
+<br>   
+
+<br>   
+<br> 
+
+    <div id="jsonContainer">
+
+<nav class="navbar navbar-light bg-light fixed-bottom" id="bottom-nav" style="display: block">
+  <div class= "row">
+    <div class="col-1">
+        <button id ='save-btn' class="btn btn-light" style="float: right;" >Save</button>
+   </div>
+    <div class="col-1">
+        <button id="val-btn" class="btn btn-light" style="float: left;">Validate</button>
+    </div>
+        <div class="col-1">
+        <button id="Next-btn" class="btn btn-light" style="float: left;">Next Flagged Phenotype</button>
+    </div>
+        <div class="col"> </div>
+                <div class="col"> </div>
+
+    <div class="col">
+         <p id='Problematic_total' class="text-right" style="float: right; margin: auto;">problem Adressed.</p>
+    </div>
+    <div class="col">
+        <p id='viewing' class="text-right" style="float: right; margin: auto;">Viewing :</p>
+    </div>
+    <div class="col">
+        <p id='Included' class="text-right" style="float: right; margin: auto;">nb Included</p>
+    </div>
+    </div>
+    </nav>
+
+            <script type="text/javascript">
+                
+                window.addEventListener('beforeunload', (event) => {
+    navigator.sendBeacon('/shutdown');
+});
+            </script>
+
+
+    <!-- JavaScript at the bottom for faster page loading -->
+<!-- import jquery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<!-- Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+<!--Modal JS Script -->
+<script type="text/javascript">
+    window.onload = () => {
+      const myModal = new bootstrap.Modal('#onload');
+      myModal.show();
+    }
+</script>
+
+
+    <script src="filter_2.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+</body>
+</html>
