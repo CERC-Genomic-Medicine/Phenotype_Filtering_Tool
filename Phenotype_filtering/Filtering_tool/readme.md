@@ -7,11 +7,11 @@ We aim for to be a companion to a phenotypic summary statistic pipeline. it's fu
 
 1) Download the system appropriate executable (windows or mac) and place it within the same directory as the output of the phenotypic summary statistic pipeline (more detail can be obtained below).
 2) After opening the executable, you will be prompted which type of variable is desired :
-![Prompt](Phenotype_Filtering_Tool/Phenotype_filtering/Filtering_tool/util/prompt.png)
+![Prompt](util/prompt.png)
    This relies on the presence of a file named continuous_data.json or binary_data.json (depending on the selected option)
 3) Phenotypes will be displayed.
-![Phenotype Display](Phenotype_Filtering_Tool/Phenotype_filtering/Filtering_tool/util/Phenotype.png)
+![Phenotype Display](util/Phenotype.png)
 4) (Optional) To establish a default proposed filtering click the 'fill in Filters by default'
-![Phenotype Default](Phenotype_Filtering_Tool/Phenotype_filtering/Filtering_tool/util/Default.png)
+![Phenotype Default](util/Default.png)
 6) (Optional) 'Validate' button will interrogate all flagged phenotype for either Exclusion or Sex-Specific filters.
 7) 'Save' will record the filters within the read file.
