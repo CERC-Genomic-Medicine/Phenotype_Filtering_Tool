@@ -312,7 +312,7 @@ jsonData.forEach(function(obj,index) {
                         id: obj["[Description] Variable"].replace(/ /g, '_')+key+'_text',
                         class: "topic-picker ui-autocomplete-input",
                         type: "text",
-                        maxlength: "10",
+                        maxlength: "100",
                         placeholder: 'Justification to not exclude',
                         role: "textbox",
                         'aria-autocomplete': "list",
