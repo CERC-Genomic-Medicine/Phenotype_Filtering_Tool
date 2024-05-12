@@ -64,7 +64,7 @@ function searchAutocomplete() {
   if (!input) return false;
 
   jsonData.forEach(function(obj) {
-    var descriptionVariable = obj["[Description] Variable"] || "";
+    var descriptionVariable = obj["[Description] Variable"].replace(/ /g, '_') || "";
     var descriptionLabel = obj["[Description] Label"] || "";
 
     // Use regex test to check for match instead of includes
@@ -77,7 +77,7 @@ function searchAutocomplete() {
 
         document.getElementById(descriptionVariable).scrollIntoView()
             jsonData.forEach(function(obj,index) {
-            if (obj["[Description] Variable"] ==descriptionVariable) {currentIndex=index}
+            if (obj["[Description] Variable"].replace(/ /g, '_') ==descriptionVariable) {currentIndex=index}
             })
             update();
       });
@@ -101,11 +101,11 @@ function update(){
     jsonData.forEach(function(obj,index) {
         if (obj['[Hidden] problem'].length !==0) {problematic++
             if (obj['[Hidden] problem'].includes('Sex-Specific ?')){SexSpecific++}
-            exclude = document.getElementById(obj["[Description] Variable"]+'To exclude_box').checked ;
-            SS = document.getElementById(obj["[Description] Variable"]+'Sex-Specific_box').checked ;
+            exclude = document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+'To_exclude_box').checked ;
+            SS = document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+'Sex-Specific_box').checked ;
             if (exclude || SS) {problematic_addressed++}
         } 
-        if (!obj['To exclude']){
+        if (!obj['To_exclude']){
             included++
         }
     });
@@ -138,48 +138,48 @@ function Rounder(number) {
 // Update jsonData with default values for Included, Normalize and Threshold properties
 function saveChanges() {
   jsonData.forEach(function(obj) {
-    if (window.form === 'Continuous'){
-      ['Not normalize','To exclude'].forEach(function (textName) {
-          textbox = document.getElementById(obj["[Description] Variable"]+textName+'_text');
-          checkbox = document.getElementById(obj["[Description] Variable"]+textName+'_box');
-          if (checkbox.checked !== false) {
+    if (file_type === 'continuous'){
+      ['Not_normalize','To_exclude'].forEach(function (textName) {
+          textbox = document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+textName+'_text');
+          checkbox = document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+textName+'_box');
+          if (checkbox.checked) {
               obj["justification_" + textName] = textbox.value ;
           }
       });
       ['Sex-Specific'].forEach(function (ChoiceName) {
-          listOptions = document.getElementById(obj["[Description] Variable"]+ChoiceName+'_options');
-          checkbox = document.getElementById(obj["[Description] Variable"]+ChoiceName+'_box');
+          listOptions = document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+ChoiceName+'_options');
+          checkbox = document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+ChoiceName+'_box');
           if (checkbox.checked !== false) {
               obj["Choice_" + ChoiceName] = listOptions.value ;
           }
       });
-      ["To exclude", "Not normalize","Sex-Specific"].forEach(function (checkboxName) {
+      ["To_exclude", "Not_normalize","Sex-Specific"].forEach(function (checkboxName) {
           obj[checkboxName] = obj[checkboxName] || false;
       });
-      ["Threshold Left", "Threshold Right"].forEach(function (thresholdName) {
+      ["Threshold_Left", "Threshold_Right"].forEach(function (thresholdName) {
           obj[thresholdName] = obj[thresholdName] !== null && obj[thresholdName] !== undefined ? obj[thresholdName] : null;
-           textbox = document.getElementById(obj["[Description] Variable"]+thresholdName+'_text');
+           textbox = document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+thresholdName+'_text');
           if (obj[thresholdName] !== null && obj[thresholdName] !== undefined) {
               obj["justification_" + thresholdName] = textbox.value ;
           }
       });
     }
-    else if (window.form === 'Binary'){
-        ['To exclude'].forEach(function (textName) {
-        textbox = document.getElementById(obj["[Description] Variable"]+textName+'_text');
-        checkbox = document.getElementById(obj["[Description] Variable"]+textName+'_box');
+    else if (file_type === 'binary'){
+        ['To_exclude'].forEach(function (textName) {
+        textbox = document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+textName+'_text');
+        checkbox = document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+textName+'_box');
         if (checkbox.checked !== false) {
             obj["justification_" + textName] = textbox.value ;
         }
     });
     ['Sex-Specific'].forEach(function (ChoiceName) {
-        listOptions = document.getElementById(obj["[Description] Variable"]+ChoiceName+'_options');
-        checkbox = document.getElementById(obj["[Description] Variable"]+ChoiceName+'_box');
+        listOptions = document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+ChoiceName+'_options');
+        checkbox = document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+ChoiceName+'_box');
         if (checkbox.checked !== false) {
             obj["Choice_" + ChoiceName] = listOptions.value ;
         }
     });
-    ["To exclude","Sex-Specific"].forEach(function (checkboxName) {
+    ["To_exclude","Sex-Specific"].forEach(function (checkboxName) {
         obj[checkboxName] = obj[checkboxName] || false;
     });
     }
@@ -264,25 +264,21 @@ function display(text, object){
 
 
 function loader(){
+console.log('test')
 jsonData.forEach(function(obj,index) {
     var objectDix = document.createElement('nav-item');
-    objectDix.id=obj["[Description] Variable"]
-                var headerKeys = Object.keys(obj);
-                ["Sex-Specific",'To exclude'].forEach(function(key){
-                    if (!headerKeys.includes(key)){headerKeys.splice(1, 0, key)}
-                    });
-                if (typeof obj['[Statistics] N unique values'] !== "undefined" || obj['[Statistics] N unique values'] > 2){
-                    ["Threshold Right",'Threshold Left','Not normalize'].forEach(function(key){
-                        if (!headerKeys.includes(key)){headerKeys.splice(1, 0, key)}
-                        });
+    objectDix.id=obj["[Description] Variable"].replace(/ /g, '_')
+                if (file_type === 'continuous'){
+                    var headerKeys =['To_exclude','Not_normalize',"Threshold_Right",'Threshold_Left',"Sex-Specific"]
                     }
+                else {var headerKeys =['To_exclude',"Sex-Specific"]}
                 //Create a header explaining phenotype
                 var title= document.createElement("h1");
                 title.textContent=obj["[Description] Label"] ;
                 title.className="text-center"
                 var title2= document.createElement("h3");
                 title2.className="text-center"
-                title2.textContent= obj["[Description] Variable"] ;
+                title2.textContent= obj["[Description] Variable"].replace(/ /g, '_') ;
                 objectDix.appendChild(title);
                 objectDix.appendChild(title2);
                 //Create Container of all tables with bootstrap grid so in-line
@@ -291,36 +287,53 @@ jsonData.forEach(function(obj,index) {
                 // 1) Options table
                 var Container_table1 = document.createElement('div');
                 Container_table1.className = "col" ;
-                Container_table1.id = obj["[Description] Variable"]+'Container_table1';
+                Container_table1.id = obj["[Description] Variable"].replace(/ /g, '_')+'Container_table1';
                 var table1 = document.createElement("table");
                 var thead1 = table1.createTHead();
                 var tbody1 = table1.createTBody();
                 thead1.textContent = 'Filters';
-                headerKeys.forEach(function(key) {
-                    if (key === "To exclude"){
+                [headerKeys].forEach(function(key) {
+                    if (key === "To_exclude"){
                         row = tbody1.insertRow();
                         var th = document.createElement("th");
-                        th.textContent = key;
+                        th.textContent = key.replace(/_/g, ' ');
                         row.appendChild(th);
                         var td = row.insertCell()
                         var checkbox = document.createElement("input");
                         checkbox.type = "checkbox";
                         checkbox.checked = obj[key] || false;
-                        checkbox.id=obj["[Description] Variable"]+key+'_box';
+                        checkbox.id=obj["[Description] Variable"].replace(/ /g, '_')+key+'_box';
                         td.appendChild(checkbox);
                         checkbox.addEventListener('change', function() {
                             jsonData[index][key] = checkbox.checked;
                         });
                         var textbox = document.createElement("input"); 
-                        textbox.type = "text";
-                        textbox.className='form-control';
-                        textbox.id = obj["[Description] Variable"]+key+'_text';
+                        const attributes = {
+                        id: obj["[Description] Variable"].replace(/ /g, '_')+key+'_text',
+                        class: "topic-picker ui-autocomplete-input",
+                        type: "text",
+                        maxlength: "10",
+                        placeholder: 'Justification to not exclude',
+                        role: "textbox",
+                        'aria-autocomplete': "list",
+                        'aria-haspopup': "true"
+                        };
+                        Object.entries(attributes).forEach(([hey, value]) => textbox.setAttribute(hey, value));
                         textbox.style.display=checkbox.checked !== false ? "block" : "none";
-                        textbox.placeholder='Justification to exclude';
-                        textbox.value = checkbox.checked !== false ? obj["justification_" + key].toString() : "";
+                        textbox.value = checkbox.checked !== false ? jsonData[index]["justification_" + key].toString() : "";
+                        if (checkbox.checked === false){
+                            jsonData[index]["justification_" + key]==""
+                        }
                         td.appendChild(textbox);
                         checkbox.addEventListener("click", function() {
-                            toggleTextbox(obj["[Description] Variable"] + key) })
+                            toggleTextbox(obj["[Description] Variable"].replace(/ /g, '_') + key) })
+
+                        textbox.addEventListener("click", function() {
+                            var inputId = obj["[Description] Variable"].replace(/ /g, '_')+key+'_text';
+                        $(`#${inputId}`).autocomplete({
+                            source: getUniqueFeatureValues(jsonData, key)
+                        });
+                        });
                     }
                     else if (key === "Sex-Specific"){
                             row = tbody1.insertRow();
@@ -331,13 +344,13 @@ jsonData.forEach(function(obj,index) {
                             var checkbox = document.createElement("input");
                             checkbox.type = "checkbox";
                             checkbox.checked = obj[key] || false;
-                            checkbox.id = obj["[Description] Variable"] + key + '_box';
+                            checkbox.id = obj["[Description] Variable"].replace(/ /g, '_') + key + '_box';
                             td.appendChild(checkbox);
                             checkbox.addEventListener('change', function() {
                                 jsonData[index][key] = checkbox.checked;
                             });
                             var SexInput = document.createElement("select");; 
-                            SexInput.id = obj["[Description] Variable"] + key +'_options';
+                            SexInput.id = obj["[Description] Variable"].replace(/ /g, '_') + key +'_options';
                             var noneOption = document.createElement("option");
                             noneOption.value = "None";
                             noneOption.text = "None";
@@ -354,17 +367,17 @@ jsonData.forEach(function(obj,index) {
                             SexInput.value = checkbox.checked !== false ? obj["Choice_" + key].toString() : "";
                             td.appendChild(SexInput);
                         checkbox.addEventListener("click", function() {
-                            togglelistOptions(obj["[Description] Variable"] + key)
+                            togglelistOptions(obj["[Description] Variable"].replace(/ /g, '_') + key)
                         });
                     } 
-                    else if (key === "Threshold Left" || key === "Threshold Right") { //creates drop down menu
+                    else if (key === "Threshold_Left" || key === "Threshold_Right") { //creates drop down menu
                         row = tbody1.insertRow();
                         var th = document.createElement("th");
-                        th.textContent = key;
+                        th.textContent = key.replace(/_/g, ' ');
                         row.appendChild(th);
                         var td = row.insertCell()
                         var thresholdInput = document.createElement("select");
-                        thresholdInput.id=obj["[Description] Variable"]+key+'_input';
+                        thresholdInput.id=obj["[Description] Variable"].replace(/ /g, '_')+key+'_input';
                         var noneOption = document.createElement("option");
                         noneOption.value = "None";
                         noneOption.text = "None";
@@ -376,46 +389,84 @@ jsonData.forEach(function(obj,index) {
                             thresholdInput.add(option);
                         }
 
-                        thresholdInput.value = obj[key] !== null && obj[key] !== undefined ? obj[key].toString() : "None";
+                        thresholdInput.value = obj[key] !== null && obj[key] !== undefined ? obj[key].toString()+ 'SD' : "None";
                         thresholdInput.addEventListener('change', function() {
                         jsonData[index][key] = thresholdInput.value !== "None" ? parseInt(thresholdInput.value) : null;
                     })
                         var textbox = document.createElement("input"); 
-                        textbox.type="text";
-                        textbox.id=obj["[Description] Variable"]+key+'_text';
+                        const attributes = {
+                        id: obj["[Description] Variable"].replace(/ /g, '_')+key+'_text',
+                        class: "topic-picker ui-autocomplete-input",
+                        type: "text",
+                        maxlength: "100",
+                        name: "q",
+                        acceskey: "b",
+                        autocomplete: "off",
+                        placeholder: 'Justification to not normalize',
+                        role: "textbox",
+                        'aria-autocomplete': "list",
+                        'aria-haspopup': "true"
+                        };
+                        Object.entries(attributes).forEach(([key, value]) => textbox.setAttribute(key, value));
                         textbox.style.display= thresholdInput.value !== 'None' ? "block" : "none";
-                        textbox.placeholder='Justification';
-                        thresholdInput.value = obj[key] !== null && obj[key] !== undefined ? obj[key].toString() : "None";
                         textbox.value = typeof obj["justification_" + key] !== 'undefined' ? obj["justification_" + key].toString() : "";
                         thresholdInput.addEventListener("click", function() {
-                            toggleTextboxOptions(obj["[Description] Variable"]+key)
+                            toggleTextboxOptions(obj["[Description] Variable"].replace(/ /g, '_')+key)
+                        });
+                        textbox.addEventListener("click", function() {
+                        var inputId = obj["[Description] Variable"].replace(/ /g, '_')+key+'_text';
+                        $(`#${inputId}`).autocomplete({
+                            source: getUniqueFeatureValues(jsonData, key)
+                        });
                         });
                         td.appendChild(thresholdInput)
                         td.appendChild(textbox);
                     } 
-                    else if (key === "Not normalize"){
+                    else if (key === "Not_normalize"){
                         row = tbody1.insertRow();
                         var th = document.createElement("th");
-                        th.textContent = key;
+                        th.textContent = key.replace(/_/g, ' ');
                         row.appendChild(th);
                         var td = row.insertCell()
                         var checkbox = document.createElement("input");
                         checkbox.type = "checkbox";
                         checkbox.checked = obj[key] || false;
-                        checkbox.id=obj["[Description] Variable"]+key+'_box';
+                        checkbox.id=obj["[Description] Variable"].replace(/ /g, '_')+key+'_box';
                         td.appendChild(checkbox);
                         checkbox.addEventListener('change', function() {
                             jsonData[index][key] = checkbox.checked;
                         });
                         var textbox = document.createElement("input"); 
-                        textbox.type="text";
-                        textbox.id=obj["[Description] Variable"]+key+'_text';
+                        const attributes = {
+                        id: obj["[Description] Variable"].replace(/ /g, '_')+key+'_text',
+                        class: "topic-picker ui-autocomplete-input",
+                        type: "text",
+                        maxlength: "100",
+                        name: "q",
+                        acceskey: "b",
+                        autocomplete: "off",
+                        placeholder: 'Justification to not normalize',
+                        role: "textbox",
+                        'aria-autocomplete': "list",
+                        'aria-haspopup': "true"
+                        };
+                        Object.entries(attributes).forEach(([key, value]) => textbox.setAttribute(key, value));
                         textbox.style.display=checkbox.checked !== false ? "block" : "none";
-                        textbox.placeholder='Justification to not normalize';
                         textbox.value = checkbox.checked !== false ? obj["justification_" + key].toString() : "";
                         td.appendChild(textbox);
                         checkbox.addEventListener("click", function() {
-                            toggleTextbox(obj["[Description] Variable"] + key)
+                            toggleTextbox(obj["[Description] Variable"].replace(/ /g, '_') + key)
+                        });
+                        textbox.addEventListener("click", function() {
+                        textbox.autocomplete({
+                            source: getUniqueFeatureValues(jsonData, key)
+                        });
+                        });
+                        textbox.addEventListener("click", function() {
+                        var inputId = obj["[Description] Variable"].replace(/ /g, '_')+key+'_text';
+                        $(`#${inputId}`).autocomplete({
+                            source: getUniqueFeatureValues(jsonData, key)
+                        });
                         });
                 }
                 });
@@ -428,8 +479,8 @@ jsonData.forEach(function(obj,index) {
                Container_image1.style.justifyContent = 'center';
    if (typeof obj['[Statistics] N unique values'] === "undefined" || obj['[Statistics] N unique values'] > 1) {
                var separatorImage = document.createElement("img");
-               separatorImage.id = obj["[Description] Variable"] + "_image";
-               fetch_image(obj["[Description] Variable"]);
+               separatorImage.id = obj["[Description] Variable"].replace(/ /g, '_') + "_image";
+               fetch_image(obj["[Description] Variable"].replace(/ /g, '_'));
                separatorImage.classList.add("separator-image");
                Container_image1.appendChild(separatorImage);
             }
@@ -502,11 +553,11 @@ if (document.attachEvent){ //if IE (and Opera depending on user setting)
 function verify_integrity (){ 
         jsonData.forEach(function(obj,index) {
             let variables = [];
-            if (variables.includes(obj["[Description] Variable"])) {
+            if (variables.includes(obj["[Description] Variable"].replace(/ /g, '_'))) {
                 console.error('Error, multiple object in JSON file have the same "[Description] Variable" value');
                 alert('Error, multiple object in JSON file have the same "[Description] Variable" value');
             }
-            else {variables.push(obj["[Description] Variable"]);}
+            else {variables.push(obj["[Description] Variable"].replace(/ /g, '_'));}
 })
 }
 
@@ -572,24 +623,23 @@ let included = 0;
 document.getElementById('submitButtonDefaults').addEventListener('click', function() {
     if (document.getElementById('Default').checked !== false) {
     jsonData.forEach(function(obj,index) {
-        ['To exclude','Not normalize'].forEach(function(key){
-            if (typeof document.getElementById(obj["[Description] Variable"]+key+'_box') !== "undefined") {
+        ['To_exclude','Not_normalize'].forEach(function(key){
+            if (typeof document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+key+'_box') !== "undefined") {
                 if(document.getElementById('Default_'+key).value !== "0") {
-                document.getElementById(obj["[Description] Variable"]+key+'_box').checked = (document.getElementById('Default_'+key).value == "Yes")
-                console.error(key)
-                console.error(document.getElementById('Default_'+key).value)
-                 console.error( document.getElementById('Default_'+key).value == "Yes" )
-                document.getElementById(obj["[Description] Variable"]+key+'_text').value = " Default/Baseline "
-                toggleTextbox(obj["[Description] Variable"] + key)
+                document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+key+'_box').checked = document.getElementById('Default_'+key).value == 'Yes'
+                obj[key]=document.getElementById('Default_'+key).value == 'Yes'
+                document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+key+'_text').value = " Default/Baseline "
+                toggleTextbox(obj["[Description] Variable"].replace(/ /g, '_') + key)
                 }
             }
         });
-        ["Threshold Right",'Threshold Left'].forEach(function(key){
-            if (typeof document.getElementById(obj["[Description] Variable"]+key+'_box') !== "undefined") {
+        ["Threshold_Right",'Threshold_Left'].forEach(function(key){
+            if (typeof document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+key+'_box') !== "undefined") {
                 if(document.getElementById('Default_'+key).value !== "0") {
-                    document.getElementById(obj["[Description] Variable"]+key+'_input').value = document.getElementById('Default_'+key).value
-                    document.getElementById(obj["[Description] Variable"]+key+'_text').value = " Default/Baseline "
-                    toggleTextboxOptions(obj["[Description] Variable"]+key)
+                    document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+key+'_input').value = document.getElementById('Default_'+key).value
+                    document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+key+'_text').value = " Default/Baseline "
+                    obj[key]=document.getElementById('Default_'+key).value
+                    toggleTextboxOptions(obj["[Description] Variable"].replace(/ /g, '_')+key)
                 }
             }
         });
@@ -598,6 +648,20 @@ document.getElementById('submitButtonDefaults').addEventListener('click', functi
 });
 
 let file_type =''
+
+
+function getUniqueFeatureValues(jsonData, featureName) {
+    const uniqueValues = new Set(); // Use a Set to store unique values
+
+    // Iterate over each object in the jsonData array
+    jsonData.forEach(obj => {
+        if (obj[featureName] !== undefined) { // Check if the feature exists in the object
+            uniqueValues.add(document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+featureName+'_text').value); // Add the feature value to the Set
+        }
+    });
+
+    return Array.from(uniqueValues); // Convert the Set to an Array to return
+}
 
 document.getElementById('binary_choice').addEventListener('click', function() {
             file_type ='binary'
