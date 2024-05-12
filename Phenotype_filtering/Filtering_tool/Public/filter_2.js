@@ -292,7 +292,7 @@ jsonData.forEach(function(obj,index) {
                 var thead1 = table1.createTHead();
                 var tbody1 = table1.createTBody();
                 thead1.textContent = 'Filters';
-                [headerKeys].forEach(function(key) {
+                headerKeys.forEach(function(key) {
                     if (key === "To_exclude"){
                         row = tbody1.insertRow();
                         var th = document.createElement("th");
