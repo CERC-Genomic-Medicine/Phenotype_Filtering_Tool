@@ -1,7 +1,11 @@
 function toggleTextbox(vary) {
   const checkbox = document.getElementById(vary+'_box');
   const textbox = document.getElementById(vary+'_text');
+  const explanation = document.getElementById(vary+'_header');
+  const varbox = document.getElementById(vary+'_var');
   textbox.style.display = checkbox.checked ? 'block' : 'none';
+  if (varbox !== null) {varbox.style.display = checkbox.checked ? 'block' : 'none';}
+  if (explanation !== null) {explanation.style.display = checkbox.checked ? 'block' : 'none';}
 }
 
 function toggleTextboxOposite(vary) {
@@ -146,6 +150,15 @@ function saveChanges() {
               obj["justification_" + textName] = textbox.value ;
           }
       });
+      ['Adjustement'].forEach(function (textName) {
+          textbox = document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+textName+'_text');
+          textbox2 = document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+textName+'_var');
+          checkbox = document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+textName+'_box');
+          if (checkbox.checked) {
+              obj["var_" + textName] = textbox2.value ;
+              obj["form_" + textName] = textbox.value ;
+          }
+      });
       ['Sex-Specific'].forEach(function (ChoiceName) {
           listOptions = document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+ChoiceName+'_options');
           checkbox = document.getElementById(obj["[Description] Variable"].replace(/ /g, '_')+ChoiceName+'_box');
@@ -153,7 +166,7 @@ function saveChanges() {
               obj["Choice_" + ChoiceName] = listOptions.value ;
           }
       });
-      ["To_exclude", "Not_normalize","Sex-Specific"].forEach(function (checkboxName) {
+      ["To_exclude", "Not_normalize","Sex-Specific",'Remove_Zeros','Adjustement'].forEach(function (checkboxName) {
           obj[checkboxName] = obj[checkboxName] || false;
       });
       ["Threshold_Left", "Threshold_Right"].forEach(function (thresholdName) {
@@ -269,7 +282,7 @@ jsonData.forEach(function(obj,index) {
     var objectDix = document.createElement('nav-item');
     objectDix.id=obj["[Description] Variable"].replace(/ /g, '_')
                 if (file_type === 'continuous'){
-                    var headerKeys =['To_exclude','Not_normalize',"Threshold_Right",'Threshold_Left',"Sex-Specific"]
+                    var headerKeys =['To_exclude','Not_normalize',"Threshold_Right",'Threshold_Left',"Sex-Specific","Adjustement","Remove_Zeros"]
                     }
                 else {var headerKeys =['To_exclude',"Sex-Specific"]}
                 //Create a header explaining phenotype
@@ -278,7 +291,7 @@ jsonData.forEach(function(obj,index) {
                 title.className="text-center"
                 var title2= document.createElement("h3");
                 title2.className="text-center"
-                title2.textContent= obj["[Description] Variable"].replace(/ /g, '_') ;
+                title2.textContent= obj["[Description] Variable"];
                 objectDix.appendChild(title);
                 objectDix.appendChild(title2);
                 //Create Container of all tables with bootstrap grid so in-line
@@ -334,6 +347,77 @@ jsonData.forEach(function(obj,index) {
                             source: getUniqueFeatureValues(jsonData, key)
                         });
                         });
+                    }
+                    if (key === "Remove_Zeros"){
+                        row = tbody1.insertRow();
+                        var th = document.createElement("th");
+                        th.textContent = key.replace(/_/g, ' ');
+                        row.appendChild(th);
+                        var td = row.insertCell()
+                        var checkbox = document.createElement("input");
+                        checkbox.type = "checkbox";
+                        checkbox.checked = obj[key] || false;
+                        checkbox.id=obj["[Description] Variable"].replace(/ /g, '_')+key+'_box';
+                        td.appendChild(checkbox);
+                        checkbox.addEventListener('change', function() {
+                            jsonData[index][key] = checkbox.checked;
+                        });
+                    }
+                    if (key === "Adjustement"){
+                        row = tbody1.insertRow();
+                        var th = document.createElement("th");
+                        th.textContent = key.replace(/_/g, ' ');
+                        row.appendChild(th);
+                        var td = row.insertCell()
+                        var checkbox = document.createElement("input");
+                        checkbox.type = "checkbox";
+                        checkbox.checked = obj[key] || false;
+                        checkbox.id=obj["[Description] Variable"].replace(/ /g, '_')+key+'_box';
+                        td.appendChild(checkbox);
+                        checkbox.addEventListener('change', function() {
+                            jsonData[index][key] = checkbox.checked;
+                        });
+                        var textbox = document.createElement("input"); 
+                        const attributes_var = {
+                        id: obj["[Description] Variable"].replace(/ /g, '_')+key+'_var',
+                        class: "form-control",
+                        type: "text",
+                        maxlength: "1000",
+                        placeholder: 'variable name',
+                        role: "textbox",
+                        };
+                        Object.entries(attributes_var).forEach(([hey, value]) => textbox.setAttribute(hey, value));
+                        textbox.style.display=checkbox.checked !== false ? "block" : "none";
+                        textbox.value = checkbox.checked !== false ? jsonData[index]["var_" + key].toString() : "";
+                        if (checkbox.checked === false){
+                            jsonData[index]["var_" + key]==""
+                        }
+                        td.appendChild(textbox);
+                        var textbox2 = document.createElement("input"); 
+                        const attributes = {
+                        id: obj["[Description] Variable"].replace(/ /g, '_')+key+'_text',
+                        class: "form-control",
+                        type: "text",
+                        maxlength: "200",
+                        placeholder: 'formula (i.e Y - 10*X)',
+                        role: "textbox",
+                        };
+                        Object.entries(attributes).forEach(([hey, value]) => textbox2.setAttribute(hey, value));
+                        textbox2.style.display=checkbox.checked !== false ? "block" : "none";
+                        textbox2.value = checkbox.checked !== false ? jsonData[index]["form_" + key].toString() : "";
+                        if (checkbox.checked === false){
+                            jsonData[index]["form_" + key]==""
+                        }
+                        var explanation= document.createElement("div");
+                        explanation.className="text-left"
+                        explanation.id=obj["[Description] Variable"].replace(/ /g, '_')+key+'_header';
+                        explanation.style.display=checkbox.checked !== false ? "block" : "none";
+                        explanation.innerHTML= "X : adjustement variable <br> Y: variable to adjust";
+                        td.appendChild(textbox2);
+                        td.appendChild(explanation);
+                        checkbox.addEventListener("click", function() {
+                            toggleTextbox(obj["[Description] Variable"].replace(/ /g, '_') + key) })
+
                     }
                     else if (key === "Sex-Specific"){
                             row = tbody1.insertRow();
@@ -662,6 +746,8 @@ function getUniqueFeatureValues(jsonData, featureName) {
 
     return Array.from(uniqueValues); // Convert the Set to an Array to return
 }
+
+
 
 document.getElementById('binary_choice').addEventListener('click', function() {
             file_type ='binary'
